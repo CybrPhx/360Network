@@ -100,7 +100,7 @@ public class Activity implements Comparable<Activity> {
 	
 	public String toString() {
 		String result = "Node: "  + name  + "\nPredecessors: " +
-				printPredecessors() + "\nDuration: " + duration + "\n____________\n";				
+				printPredecessors() + "\nDuration: " + duration + "\n************\n";				
 		return result;
 	}
 	

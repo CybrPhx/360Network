@@ -4,6 +4,9 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
+import java.util.List;
+import java.io.*;
+import java.util.Scanner;
 
 public class CreatePanel extends JPanel
  {
@@ -24,13 +27,25 @@ public class CreatePanel extends JPanel
    private JTextField field3;
    private JTextArea area1;
    private JScrollPane pane1;
-
+   private final String FILENAME = 
+		   "C:\\Users\\Sergio Rodríguez\\Documents\\CSC\\Java\\src\\DiagramParser\\out.txt";
+   private FileWriter fw = null;
+   private BufferedWriter bw = null;
+   private int changed_duration;
+   private String changed_activity;
+   private static List<String> predecessor = new ArrayList<String>();
+   private static List<Activity> activities;
 
  //Constructor initializes components and organize them using certain layouts
  public CreatePanel(ArrayList nodeList)
   {
     this.nodeList = nodeList;
-
+    
+    try{
+    fw = new FileWriter(FILENAME);
+    bw = new BufferedWriter(fw);
+    } catch (Exception e){ System.out.println("my error: " + e);};
+    
     //organize components here
 	//setting gridlayout for the content
 	this.setLayout(new GridLayout(0,2));
@@ -118,45 +133,122 @@ public class CreatePanel extends JPanel
 
   private class ButtonListener implements ActionListener
     {
-		//nodeS[] tree = new nodeS[100];
-		int inc=0;
-
-         public void actionPerformed(ActionEvent event)
+		public void actionPerformed(ActionEvent event)
          {
-
+			/*
+			 * once you manually add the activities, duration, dep's by pressing next
+			 * they will all transfer to the out.txt file which is then read here when the 
+			 * keyword PROCESS is activated
+			 */
 
 			if(event.getSource()==process){
-
+				
 			//making sure the text fields all have an input
-			if (field1.getText().equals(""))
+			if (field1.getText().equals("")){
 				label1.setText("Please enter all fields");
-			else if (field2.getText().equals(""))
-				label1.setText("Please enter all fields");
-			else if (field3.getText().equals(""))
-				label1.setText("Please enter all fields");
-
-			else{
-				try
-					{
-					Integer.parseInt(field3.getText());
-					}
-				catch(NumberFormatException ex){
-					label1.setText("Please enter an integer for duration");
-				}
 			}
-			String activity = field1.getText();
-			int TempInt = Integer.parseInt(field3.getText());
-			String depend = field2.getText();
-			//nodeS obj1 = new nodeS(activity,TempInt,depend);
-			//tree[inc] = obj1;
-			inc++;
+			else if (field2.getText().equals("")){
+				label1.setText("Please enter all fields");
+			}
+			else if (field3.getText().equals("")){
+				label1.setText("Please enter all fields");
+			}
+			else
+			{
+			/*
+			 * This is where all the funkiness goes.
+			 */
+				activities = new LinkedList<>();
+			    File file = 
+			      new File("C:\\Users\\Sergio Rodríguez\\Documents\\CSC\\Java\\src\\DiagramParser\\out.txt"); 
+			    Scanner sc;
+			    try
+			    {
+			    sc = new Scanner(file);
+			    
+			    int activitycount = 1;
+			    
+				while ( sc.hasNextLine() ){
+				
+				String s = sc.nextLine();
+				
+				String[] tokens = s.split(",");
+			   
+				String nodeName;
+				String getDuration;
+				String getPredecessor;
+				
+				if (tokens.length <= 2)
+				{
+					System.out.println("in if true");
+					//System.out.println("Insert Activity: ");
+					nodeName = tokens[0];
+					
+					//System.out.println("Insert Duration: ");
+					getDuration = tokens[1];
+				
+					//System.out.println("Insert Dependencies: ");
+					getPredecessor = "";
+				}
+				else
+				{
+					System.out.println("in else");
+					//System.out.println("Insert Activity: ");
+					nodeName = tokens[0];
+					
+					//System.out.println("Insert Duration: ");
+					getDuration = tokens[1];
+				
+					//System.out.println("Insert Dependencies: ");
+					getPredecessor= "";
+					for (int x = 2; x < tokens.length; x++){
+					getPredecessor = getPredecessor+ tokens[x] + " ";
+					}
+				}
+		        
+		        predecessor = Arrays.asList(getPredecessor.split(" "));
+		        Activity newActivity = new Activity(null);
+				newActivity.setName(nodeName);
+				newActivity.setDuration(Integer.parseInt(getDuration));
+				for(int i = 0; i < predecessor.size(); i++) {		
+					newActivity.addPredecessor(predecessor.get(i));
+				}
+				
+				activities.add(newActivity);
+				activitycount++;
+				
+				String k = Network.createTree(activities, -1, null);
+				
+				area1.setText("here's all path: \n" + k);
+				}
+			
+			    } catch (Exception e){ System.out.println("MyError15: " + e); };
+			}
 		}
+			/*
+			 * Here is where the NEXT
+			 */
+		else if(event.getSource()==next){
 
+				String content = "";
+				content = field1.getText() + "," + field3.getText() + "," + field2.getText();
+				try{
+				bw.append(content);
+				bw.flush();
+				fw.flush();
+				bw.newLine();
+
+				} catch(Exception k){System.out.println("MyError14: " + k); };
+		}
 		else if(event.getSource()==restart){
 			area1.setText("");
 			field1.setText("");
 			field2.setText("");
 			field3.setText("");
+			try{
+			bw.write("");
+			bw.flush();
+			} catch (Exception e){System.out.println("MyError17: " + e);};
 			}
 		else if(event.getSource()==help){
 			JOptionPane.showMessageDialog(null,"The application will recieve three inputs from the user at once.\n"

@@ -2,10 +2,10 @@ package DiagramParser;
 
 import java.io.*;
 import java.util.*;
-import java.util.*;
 
 
-public class Main {
+
+public class Main  {
 	
 	public int changed_duration;
 	public String changed_activity;
@@ -14,15 +14,14 @@ public class Main {
 	
 	public static void main(String[] args) throws Exception {
 		
-		System.out.println("in main");
-		program();
+		
 	
 	}
 	public static void program() throws Exception{
 		
 		List<String> temporary = new LinkedList<String>();
-		activities = new LinkedList<>();
 		
+		activities = new LinkedList<>();
 	    File file = 
 	      new File("C:\\Users\\Sergio Rodríguez\\Documents\\CSC\\Java\\src\\DiagramParser\\input.txt"); 
 	    Scanner sc = new Scanner(file); 
@@ -65,7 +64,7 @@ public class Main {
 			}
 		}
         
-        temporary.clear();
+       // temporary.clear();
 		
         
         predecessor = Arrays.asList(getPredecessor.split(" "));
@@ -75,16 +74,6 @@ public class Main {
 		for(int i = 0; i < predecessor.size(); i++) {		
 			newActivity.addPredecessor(predecessor.get(i));
 		}
-        
-        
-        /*
-		Activity newActivity = new Activity(null);
-		newActivity.setName(nodeName);
-		newActivity.setDuration(Integer.parseInt(getDuration));
-		for(int i = 0; i < predecessors.size(); i++) {		
-			newActivity.addPredecessor(predecessors.get(i));
-		
-		}*/
 		
 		activities.add(newActivity);
 		
